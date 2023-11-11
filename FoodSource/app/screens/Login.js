@@ -14,20 +14,23 @@ import {
   signInWithEmailAndPassword,
 } from "firebase/auth";
 
-const Login = () => {
+const Login = ({ navigation }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [role, setRole] = useState("");
   const [loading, setLoading] = useState("");
   const auth = FIREBASE_AUTH;
 
-  const { control, handleSubmit, errors } = useForm();
+  const { control } = useForm();
 
   const signIn = async () => {
     setLoading(true);
     try {
       const response = await signInWithEmailAndPassword(auth, email, password);
       console.log(response);
+      if (response) {
+        navigation.navigate("Home"); // Navigate on successful sign in
+      }
     } catch (error) {
       console.log(error);
       alert("Sign in failed: " + error.message);
@@ -47,11 +50,14 @@ const Login = () => {
       );
       console.log(response);
       const userId = response.user.uid;
-      firestore().collection("users").doc(userId).set({
-        email: email,
-        userType: role,
-      });
+      // firestore().collection("users").doc(userId).set({
+      //   email: email,
+      //   userType: role,
+      // });
       console.log("User registered with Firestore");
+      if (response) {
+        navigation.navigate("Home"); // Navigate on successful sign in
+      }
     } catch (error) {
       console.log(error);
       alert("Sign up failed: " + error.message);
