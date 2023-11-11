@@ -8,7 +8,6 @@ import {
   Picker,
 } from "react-native";
 import { useForm, Controller } from "react-hook-form";
-import firestore from "@react-native-firebase/firestore";
 import { FIREBASE_AUTH } from "../../Firebase.Config";
 import {
   createUserWithEmailAndPassword,
