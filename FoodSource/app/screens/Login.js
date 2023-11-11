@@ -8,16 +8,57 @@ import {
   Picker,
 } from "react-native";
 import { useForm, Controller } from "react-hook-form";
+import firestore from "@react-native-firebase/firestore";
+import { FIREBASE_AUTH } from "../../Firebase.Config";
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+} from "firebase/auth";
 
 const Login = () => {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [role, setRole] = useState("");
+  const [loading, setLoading] = useState("");
+  const auth = FIREBASE_AUTH;
+
   const { control, handleSubmit, errors } = useForm();
-  const [selectedRole, setSelectedRole] = useState("customer");
 
-  const onSubmit = (data) => {
-    data.role = selectedRole;
-    console.log(data);
+  const signIn = async () => {
+    setLoading(true);
+    try {
+      const response = await signInWithEmailAndPassword(auth, email, password);
+      console.log(response);
+    } catch (error) {
+      console.log(error);
+      alert("Sign in failed: " + error.message);
+    } finally {
+      setLoading(false);
+      console.log("Signed in.");
+    }
+  };
 
-    // Here you would typically send data to your backend service
+  const signUp = async () => {
+    setLoading(true);
+    try {
+      const response = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+      console.log(response);
+      const userId = response.user.uid;
+      firestore().collection("users").doc(userId).set({
+        email: email,
+        userType: role,
+      });
+      console.log("User registered with Firestore");
+    } catch (error) {
+      console.log(error);
+      alert("Sign up failed: " + error.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -27,11 +68,11 @@ const Login = () => {
       <Text style={styles.label}>Email</Text>
       <Controller
         control={control}
-        render={({ onChange, onBlur, value }) => (
+        render={({ onBlur, value }) => (
           <TextInput
             style={styles.input}
             onBlur={onBlur}
-            onChangeText={(value) => onChange(value)}
+            onChangeText={(value) => setEmail(value)}
             value={value}
             keyboardType="email-address"
           />
@@ -40,18 +81,15 @@ const Login = () => {
         rules={{ required: true }}
         defaultValue=""
       />
-      {/* {errors.email && (
-        <Text style={styles.error}>This field is required.</Text>
-      )} */}
 
       <Text style={styles.label}>Password</Text>
       <Controller
         control={control}
-        render={({ onChange, onBlur, value }) => (
+        render={({ onBlur, value }) => (
           <TextInput
             style={styles.input}
             onBlur={onBlur}
-            onChangeText={(value) => onChange(value)}
+            onChangeText={(value) => setPassword(value)}
             value={value}
             secureTextEntry
           />
@@ -60,16 +98,13 @@ const Login = () => {
         rules={{ required: true }}
         defaultValue=""
       />
-      {/* {errors.password && (
-        <Text style={styles.error}>This field is required.</Text>
-      )} */}
 
       <Text style={styles.label}>Role</Text>
       <View style={styles.pickerContainer}>
         <Picker
-          selectedValue={selectedRole}
+          selectedValue={role}
           style={styles.picker}
-          onValueChange={(itemValue) => setSelectedRole(itemValue)}
+          onValueChange={(value) => setRole(value)}
         >
           <Picker.Item label="Consumer" value="consumer" />
           <Picker.Item label="Inspector" value="inspector" />
@@ -79,7 +114,8 @@ const Login = () => {
         </Picker>
       </View>
 
-      <Button title="Submit" onPress={handleSubmit(onSubmit)} color="#4CAF50" />
+      <Button title="Login" onPress={signIn} color="#4CAF50" />
+      <Button title="Create account" onPress={signUp} color="#4CAF50" />
     </View>
   );
 };
