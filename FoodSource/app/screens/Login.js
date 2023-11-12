@@ -5,7 +5,6 @@ import {
   View,
   TextInput,
   Button,
-  Picker,
 } from "react-native";
 import { useForm, Controller } from "react-hook-form";
 import { FIREBASE_AUTH } from "../../Firebase.Config";
@@ -13,6 +12,7 @@ import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
 } from "firebase/auth";
+import {Picker} from "@react-native-picker/picker";
 
 const Login = ({ navigation }) => {
   const [email, setEmail] = useState("");

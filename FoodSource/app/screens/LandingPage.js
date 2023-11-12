@@ -4,7 +4,7 @@ import { View, Text, Button, StyleSheet } from "react-native";
 const LandingPage = ({ navigation }) => {
   const handleScanItem = () => {
     // TODO: Handle the scanning logic or navigate to the scanning page
-    navigation.navigate("Map");
+    navigation.navigate("Scan");
   };
 
   return (
